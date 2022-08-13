@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_0l0etuj" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.3.4">
+  <bpmn:process id="importCFS" name="Import CFS" isExecutable="true">
+    <bpmn:serviceTask id="Task_0aiwli4" name="Get Service Characteristics from ONAP" camunda:asyncBefore="true" camunda:delegateExpression="${serviceCharacteristicsFromOnapDelegate}">
+      <bpmn:extensionElements>
+        <camunda:failedJobRetryTimeCycle>R5/PT5M</camunda:failedJobRetryTimeCycle>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0zt8h9o</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_07c23sw</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_07c23sw" sourceRef="Task_0aiwli4" targetRef="Task_1xwvte6" />
+    <bpmn:serviceTask id="Task_1xwvte6" name="Transform service Characteristics" camunda:asyncBefore="true" camunda:delegateExpression="${transformServiceCharactDelegate}">
+      <bpmn:extensionElements>
+        <camunda:failedJobRetryTimeCycle>R5/PT5M</camunda:failedJobRetryTimeCycle>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_07c23sw</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0r7zxal</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_1e6eo3q" name="Getting Service Specification from ONAP" camunda:asyncBefore="true" camunda:delegateExpression="${serviceSpecificationFromOnapDelegate}">
+      <bpmn:extensionElements>
+        <camunda:failedJobRetryTimeCycle>R5/PT5M</camunda:failedJobRetryTimeCycle>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0r7zxal</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_05alm8q</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_05alm8q" sourceRef="Task_1e6eo3q" targetRef="Task_005bfoi" />
+    <bpmn:serviceTask id="Task_005bfoi" name="Transform service specification" camunda:asyncBefore="true" camunda:delegateExpression="${transformServiceSpecificationDelegate}">
+      <bpmn:extensionElements>
+        <camunda:failedJobRetryTimeCycle>R5/PT5M</camunda:failedJobRetryTimeCycle>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_05alm8q</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0vqzjhi</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0vqzjhi" sourceRef="Task_005bfoi" targetRef="Task_0q7tqqm" />
+    <bpmn:serviceTask id="Task_0q7tqqm" name="Create Service Specification" camunda:asyncBefore="true" camunda:delegateExpression="${serviceSpecificationWithBmDelegate}">
+      <bpmn:extensionElements>
+        <camunda:failedJobRetryTimeCycle>R5/PT5M</camunda:failedJobRetryTimeCycle>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0vqzjhi</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1uzxd0u</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_1uzxd0u" sourceRef="Task_0q7tqqm" targetRef="Task_11r2499" />
+    <bpmn:endEvent id="EndEvent_07odshr">
+      <bpmn:incoming>SequenceFlow_1sgytrr</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1vfta7m" sourceRef="Task_11r2499" targetRef="Task_0epq54g" />
+    <bpmn:serviceTask id="Task_11r2499" name="create service specification characteristics" camunda:asyncBefore="true" camunda:delegateExpression="${serviceSpecificationCharactWithBmDelegate}">
+      <bpmn:extensionElements>
+        <camunda:failedJobRetryTimeCycle>R5/PT5M</camunda:failedJobRetryTimeCycle>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1uzxd0u</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1vfta7m</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:boundaryEvent id="BoundaryEvent_00j4lk6" attachedToRef="Task_0q7tqqm">
+      <bpmn:compensateEventDefinition />
+    </bpmn:boundaryEvent>
+    <bpmn:boundaryEvent id="BoundaryEvent_0g83k6y" attachedToRef="Task_11r2499">
+      <bpmn:compensateEventDefinition />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1sgytrr" sourceRef="Task_0epq54g" targetRef="EndEvent_07odshr" />
+    <bpmn:serviceTask id="Task_0d7iymn" name="revert created service specification" isForCompensation="true" camunda:delegateExpression="${serviceSpecificationCompensationDelegate}" />
+    <bpmn:serviceTask id="Task_151m2v8" name="revert created service spec charact" isForCompensation="true" camunda:delegateExpression="${serviceSpecificationCharactCompensationDelegate}" />
+    <bpmn:serviceTask id="Task_0epq54g" name="Update CFS Import Status" camunda:delegateExpression="${updateImportCfsStatusDelegate}">
+      <bpmn:incoming>SequenceFlow_1vfta7m</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1sgytrr</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:subProcess id="SubProcess_064k611" triggeredByEvent="true">
+      <bpmn:endEvent id="EndEvent_0ne49d9">
+        <bpmn:incoming>SequenceFlow_1qfmv8q</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_1u99bsm">
+        <bpmn:incoming>SequenceFlow_14z2r2u</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_1qfmv8q</bpmn:outgoing>
+        <bpmn:compensateEventDefinition />
+      </bpmn:intermediateThrowEvent>
+      <bpmn:sequenceFlow id="SequenceFlow_1qfmv8q" sourceRef="IntermediateThrowEvent_1u99bsm" targetRef="EndEvent_0ne49d9" />
+      <bpmn:sequenceFlow id="SequenceFlow_14z2r2u" sourceRef="StartEvent_0gs4r5t" targetRef="IntermediateThrowEvent_1u99bsm" />
+      <bpmn:startEvent id="StartEvent_0gs4r5t">
+        <bpmn:outgoing>SequenceFlow_14z2r2u</bpmn:outgoing>
+        <bpmn:errorEventDefinition errorRef="Error_0vcokis" />
+      </bpmn:startEvent>
+      <bpmn:textAnnotation id="TextAnnotation_060xbg9">
+        <bpmn:text>no retries left</bpmn:text>
+      </bpmn:textAnnotation>
+      <bpmn:association id="Association_04cp1qi" sourceRef="StartEvent_0gs4r5t" targetRef="TextAnnotation_060xbg9" />
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="SequenceFlow_0zt8h9o" sourceRef="StartEvent_0grw2o4" targetRef="Task_0aiwli4" />
+    <bpmn:endEvent id="EndEvent_0tim4wl">
+      <bpmn:incoming>SequenceFlow_1p7g757</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1p7g757" sourceRef="BoundaryEvent_0h7ydtb" targetRef="EndEvent_0tim4wl" />
+    <bpmn:boundaryEvent id="BoundaryEvent_0h7ydtb" attachedToRef="Task_0aiwli4">
+      <bpmn:outgoing>SequenceFlow_1p7g757</bpmn:outgoing>
+      <bpmn:errorEventDefinition />
+    </bpmn:boundaryEvent>
+    <bpmn:boundaryEvent id="BoundaryEvent_0rwjn9i" attachedToRef="Task_1xwvte6">
+      <bpmn:outgoing>SequenceFlow_0m4d8uq</bpmn:outgoing>
+      <bpmn:errorEventDefinition />
+    </bpmn:boundaryEvent>
+    <bpmn:endEvent id="EndEvent_1c8fxc7">
+      <bpmn:incoming>SequenceFlow_0m4d8uq</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0m4d8uq" sourceRef="BoundaryEvent_0rwjn9i" targetRef="EndEvent_1c8fxc7" />
+    <bpmn:sequenceFlow id="SequenceFlow_0r7zxal" sourceRef="Task_1xwvte6" targetRef="Task_1e6eo3q" />
+    <bpmn:startEvent id="StartEvent_0grw2o4" name="ImportCfsStartEvent">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="payload" label="enter payload" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>SequenceFlow_0zt8h9o</bpmn:outgoing>
+      <bpmn:messageEventDefinition messageRef="Message_1tvoikp" />
+    </bpmn:startEvent>
+    <bpmn:textAnnotation id="TextAnnotation_1afrmus">
+      <bpmn:text>from DTAG Aux service</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_092jn9d" sourceRef="Task_1xwvte6" targetRef="TextAnnotation_1afrmus" />
+    <bpmn:textAnnotation id="TextAnnotation_0zn0l42">
+      <bpmn:text>calling ONAP NBI rest service</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1qb8g4u" sourceRef="Task_0aiwli4" targetRef="TextAnnotation_0zn0l42" />
+    <bpmn:textAnnotation id="TextAnnotation_0mswch0">
+      <bpmn:text>calling ONAP NBI service</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1ufpx61" sourceRef="Task_1e6eo3q" targetRef="TextAnnotation_0mswch0" />
+    <bpmn:textAnnotation id="TextAnnotation_0ymfp76">
+      <bpmn:text>calling DTAG Aux service</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1uhvs8a" sourceRef="Task_005bfoi" targetRef="TextAnnotation_0ymfp76" />
+    <bpmn:textAnnotation id="TextAnnotation_0jcagph">
+      <bpmn:text>calling BM core PSR service</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_11iqiy9" sourceRef="Task_0q7tqqm" targetRef="TextAnnotation_0jcagph" />
+    <bpmn:textAnnotation id="TextAnnotation_1r5hcea">
+      <bpmn:text>calling BM core PSR service</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_061ek3a" sourceRef="Task_11r2499" targetRef="TextAnnotation_1r5hcea" />
+    <bpmn:association id="Association_1kojeg3" associationDirection="One" sourceRef="BoundaryEvent_00j4lk6" targetRef="Task_0d7iymn" />
+    <bpmn:association id="Association_0jc3sjc" associationDirection="One" sourceRef="BoundaryEvent_0g83k6y" targetRef="Task_151m2v8" />
+  </bpmn:process>
+  <bpmn:error id="Error_0vcokis" name="Error_Failed_To_Connect_Rollback" errorCode="Error_Failed_To_Connect_Rollback" />
+  <bpmn:message id="Message_1tvoikp" name="Message_050ronl" />
+  <bpmn:error id="Error_1tw0vxr" name="Error_Invaild_paylod" />
+  <bpmn:error id="Error_118w2q4" name="Error_Failed_To_Connect" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="importCFS">
+      <bpmndi:BPMNShape id="ServiceTask_0ry91tg_di" bpmnElement="Task_0aiwli4">
+        <dc:Bounds x="276" y="242" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_07c23sw_di" bpmnElement="SequenceFlow_07c23sw">
+        <di:waypoint x="376" y="282" />
+        <di:waypoint x="521" y="282" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_06dzlu6_di" bpmnElement="Task_1xwvte6">
+        <dc:Bounds x="521" y="242" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1afrmus_di" bpmnElement="TextAnnotation_1afrmus">
+        <dc:Bounds x="563" y="116" width="100" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_092jn9d_di" bpmnElement="Association_092jn9d">
+        <di:waypoint x="583" y="242" />
+        <di:waypoint x="607" y="156" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_0zn0l42_di" bpmnElement="TextAnnotation_0zn0l42">
+        <dc:Bounds x="368" y="121" width="100" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1qb8g4u_di" bpmnElement="Association_1qb8g4u">
+        <di:waypoint x="352" y="242" />
+        <di:waypoint x="405" y="161" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0si3tf7_di" bpmnElement="Task_1e6eo3q">
+        <dc:Bounds x="765" y="242" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0mswch0_di" bpmnElement="TextAnnotation_0mswch0">
+        <dc:Bounds x="849" y="126" width="100" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1ufpx61_di" bpmnElement="Association_1ufpx61">
+        <di:waypoint x="840" y="242" />
+        <di:waypoint x="887" y="166" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_05alm8q_di" bpmnElement="SequenceFlow_05alm8q">
+        <di:waypoint x="865" y="282" />
+        <di:waypoint x="917" y="282" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0n58tv7_di" bpmnElement="Task_005bfoi">
+        <dc:Bounds x="917" y="242" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0ymfp76_di" bpmnElement="TextAnnotation_0ymfp76">
+        <dc:Bounds x="965" y="133" width="100" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1uhvs8a_di" bpmnElement="Association_1uhvs8a">
+        <di:waypoint x="982" y="242" />
+        <di:waypoint x="1008" y="173" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0vqzjhi_di" bpmnElement="SequenceFlow_0vqzjhi">
+        <di:waypoint x="1017" y="282" />
+        <di:waypoint x="1078" y="282" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_078fjwj_di" bpmnElement="Task_0q7tqqm">
+        <dc:Bounds x="1078" y="242" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0jcagph_di" bpmnElement="TextAnnotation_0jcagph">
+        <dc:Bounds x="1124.925" y="133" width="100" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_11iqiy9_di" bpmnElement="Association_11iqiy9">
+        <di:waypoint x="1143" y="242" />
+        <di:waypoint x="1168" y="173" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1uzxd0u_di" bpmnElement="SequenceFlow_1uzxd0u">
+        <di:waypoint x="1178" y="282" />
+        <di:waypoint x="1259" y="282" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_07odshr_di" bpmnElement="EndEvent_07odshr">
+        <dc:Bounds x="1528" y="264" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1vfta7m_di" bpmnElement="SequenceFlow_1vfta7m">
+        <di:waypoint x="1359" y="282" />
+        <di:waypoint x="1395" y="282" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0ru9kut_di" bpmnElement="Task_11r2499">
+        <dc:Bounds x="1259" y="242" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1r5hcea_di" bpmnElement="TextAnnotation_1r5hcea">
+        <dc:Bounds x="1313.587" y="138" width="100" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_061ek3a_di" bpmnElement="Association_061ek3a">
+        <di:waypoint x="1327" y="242" />
+        <di:waypoint x="1355" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BoundaryEvent_0gpo271_di" bpmnElement="BoundaryEvent_00j4lk6">
+        <dc:Bounds x="1121" y="304" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1kojeg3_di" bpmnElement="Association_1kojeg3">
+        <di:waypoint x="1139" y="340" />
+        <di:waypoint x="1139" y="443" />
+        <di:waypoint x="1065" y="443" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BoundaryEvent_04tplvh_di" bpmnElement="BoundaryEvent_0g83k6y">
+        <dc:Bounds x="1305" y="304" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_0jc3sjc_di" bpmnElement="Association_0jc3sjc">
+        <di:waypoint x="1323" y="340" />
+        <di:waypoint x="1323" y="443" />
+        <di:waypoint x="1290" y="443" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1sgytrr_di" bpmnElement="SequenceFlow_1sgytrr">
+        <di:waypoint x="1495" y="282" />
+        <di:waypoint x="1528" y="282" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1fvab6w_di" bpmnElement="Task_0d7iymn">
+        <dc:Bounds x="965" y="403" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0r3syv8_di" bpmnElement="Task_151m2v8">
+        <dc:Bounds x="1190" y="403" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_11so6lk_di" bpmnElement="Task_0epq54g">
+        <dc:Bounds x="1395" y="242" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubProcess_0vge59n_di" bpmnElement="SubProcess_064k611" isExpanded="true">
+        <dc:Bounds x="494" y="519" width="439" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_060xbg9_di" bpmnElement="TextAnnotation_060xbg9">
+        <dc:Bounds x="559" y="537" width="100" height="30" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0ne49d9_di" bpmnElement="EndEvent_0ne49d9">
+        <dc:Bounds x="848" y="602" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="IntermediateThrowEvent_0hiwipa_di" bpmnElement="IntermediateThrowEvent_1u99bsm">
+        <dc:Bounds x="744" y="602" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_04cp1qi_di" bpmnElement="Association_04cp1qi">
+        <di:waypoint x="637" y="604" />
+        <di:waypoint x="617" y="567" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1qfmv8q_di" bpmnElement="SequenceFlow_1qfmv8q">
+        <di:waypoint x="780" y="620" />
+        <di:waypoint x="848" y="620" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="StartEvent_003oigr_di" bpmnElement="StartEvent_0gs4r5t">
+        <dc:Bounds x="627" y="602" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_14z2r2u_di" bpmnElement="SequenceFlow_14z2r2u">
+        <di:waypoint x="663" y="620" />
+        <di:waypoint x="744" y="620" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0zt8h9o_di" bpmnElement="SequenceFlow_0zt8h9o">
+        <di:waypoint x="205" y="282" />
+        <di:waypoint x="276" y="282" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0tim4wl_di" bpmnElement="EndEvent_0tim4wl">
+        <dc:Bounds x="320" y="379.589" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1p7g757_di" bpmnElement="SequenceFlow_1p7g757">
+        <di:waypoint x="338" y="340" />
+        <di:waypoint x="338" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BoundaryEvent_0th795q_di" bpmnElement="BoundaryEvent_0h7ydtb">
+        <dc:Bounds x="321" y="304" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BoundaryEvent_07iv66i_di" bpmnElement="BoundaryEvent_0rwjn9i">
+        <dc:Bounds x="553" y="304" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1c8fxc7_di" bpmnElement="EndEvent_1c8fxc7">
+        <dc:Bounds x="469" y="380" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0m4d8uq_di" bpmnElement="SequenceFlow_0m4d8uq">
+        <di:waypoint x="571" y="340" />
+        <di:waypoint x="571" y="398" />
+        <di:waypoint x="505" y="398" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0r7zxal_di" bpmnElement="SequenceFlow_0r7zxal">
+        <di:waypoint x="621" y="282" />
+        <di:waypoint x="765" y="282" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="StartEvent_0zmhrmz_di" bpmnElement="StartEvent_0grw2o4">
+        <dc:Bounds x="169" y="264" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="149" y="307" width="85" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -1,0 +1,30 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: import-cfs-process
+  labels:
+    app: import-cfs-process
+    version: latest
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: import-cfs-process
+      version: latest
+  template:
+    metadata:
+      name: import-cfs-process
+      labels:
+        app: import-cfs-process
+        version: latest
+    spec:
+      containers:
+      - name: import-cfs-process
+        image: 10.0.5.16:5000/bm/bmp-import-cfs-process:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 200m
+            memory: 0.5Gi
+        ports:
+        - containerPort: 9026
