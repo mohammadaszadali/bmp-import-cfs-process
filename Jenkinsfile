@@ -5,7 +5,7 @@ maven 'mavendev'
 }
 stages {
 stage("codecheckout"){
-step {
+steps {
 echo "hello-world"
 }
 }
